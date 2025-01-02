@@ -8,7 +8,8 @@ app.use(express.json())
 const todos = []
 
 app.get("/get-all-todos", (req, res) => {
-  res.send(todos);
+  // res.send(todos);
+  res.send("todos app");
 });
 
 
