@@ -7,9 +7,14 @@ const port = 3000;
 app.use(express.json())
 const todos = []
 
+app.get("/", (req, res) => {
+  res.send('testing todos');
+});
+
+
+
 app.get("/get-all-todos", (req, res) => {
-  // res.send(todos);
-  res.send("todos app");
+  res.send(todos);
 });
 
 
