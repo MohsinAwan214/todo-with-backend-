@@ -1,66 +1,87 @@
 import express from "express";
-// import cors from 'cors'
+import cors from 'cors'
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-const todos = [];
+let todos = [];
 app.use(express.json());
+app.use(cors( {origin : ["http://localhost:5173"] }));
 
 // app.get("/", (req, res) => {
 //   res.send('testing todos');
 // });
 
-app.get("/get-all-todos", (req, res) => {
-  res.send(todos);
+app.get("/api/v1/todos", (req, res) => {
+  const message = !todos.length ? "todo empty" : "all todos";
+
+  res.send({ data: todos, message: message });
 });
 
 // ye naya todo add krny ke ley he
-app.post("/add-todo", (req, res) => {
-  todos.push({todoContent : req.body.todo , id : String(new Date().getTime())});
+app.post("/api/v1/todo", (req, res) => {
+  const obj = {
+    todoContent: req.body.todo,
+    id: String(new Date().getTime()),
+  };
 
-  res.send("todo add ho gaya");
+  todos.push(obj);
+
+  res.send({ message: "todo add ho gaya", data: obj });
 });
 
 // ye todo ko upDate ya edit krny ke ley he
-app.patch("/edit-todo/:id", (req, res) => {
-
+app.patch("/api/v1/todo/:id", (req, res) => {
   const id = req.params.id
   console.log("ye he id", id);
-  
-const isFound = false
+  let isFound = false;
 
-
-for (let i = 0; i < todos.length; i++) {
-  if (todos[i].id === id) {
-    // idher product nil chuka he ab us product ko edit krna he
-    todos[i].todoContent = req.body.todoContent
-
-    isFound = true
+  for (let i = 0; i < todos.length; i++) {
+    if (todos[i].id === id) {
+      // idher product mil chuka he ab us product ko edit krna he
+      todos[i].todoContent = req.body.todoContent;
+      isFound = true;
+      break;
+    }
   }
-  
-}
-
-if(isFound){
-  res.status(201).send("todo updated successfully!")
-  
-}else{
-  
-  res.status(200).send('todo notfound')
-}
-
+  if (isFound) {
+    res.status(201).send({
+      data: {todoContent: req.body.todoContent, id: id,},
+      message: "todo updated successfully!",
+    });
+  } else {
+    res.status(200).send({ data: null , message: "todo not found" });
+  }
 });
 
 
-
-
-
-
-
-
-
 // ye todo ko elete krny ke ley he
-app.delete("/delete-todo/:id", (req, res) => {});
+app.delete("/api/v1/todo/:id", (req, res) => {
+
+  const id = req.params.id
+  let isFound = false;
+
+  for (let i = 0; i < todos.length; i++) {
+    if (todos[i].id === id) {
+      // idher product mil chuka he ab us product ko delete krna he
+
+todos.splice(i,1)
+
+      isFound = true;
+      break;
+    }
+  }
+  if (isFound) {
+    res.status(201).send({
+      // data: {todoContent: req.body.todoContent, id: id,},
+      message: "todo deleted successfully!",
+    });
+  } else {
+    res.status(200).send({ data: null , message: "todo not found" });
+  }
+
+
+});
 
 app.use("/", (req, res) => {
   res.status(404).send("No route found");
