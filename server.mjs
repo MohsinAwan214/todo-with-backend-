@@ -4,7 +4,7 @@ import express from "express";
 const app = express();
 const port = process.env.PORT || 3000;
 
-const todos = [];
+let todos = [];
 app.use(express.json());
 
 // app.get("/", (req, res) => {
