@@ -84,7 +84,7 @@ todos.splice(i,1)
 });
 
 app.use("/", (req, res) => {
-  res.status(404).send("No route found");
+  res.status(404).send({message:"No route found"});
 });
 
 app.listen(port, () => {
