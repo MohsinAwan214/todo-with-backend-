@@ -3,14 +3,14 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 function App() {
-  const BASE_URL = "http://localhost:3000";
+  const BASE_URL = "https://todo-with-backend-chi.vercel.app";
 
   const [todos, setTodos] = useState([]);
   // const [isEditing, setIsEditing] = useState()
   console.log(todos);
 
   const getTodo = async () => {
-    const res = await axios(`${BASE_URL}/api/v1/todos`);
+    const res = await axios.get(`${BASE_URL}/api/v1/todos`);
     const todosFromServer = res?.data?.data;
 
     console.log("todosFromServer", todosFromServer);
@@ -39,7 +39,9 @@ function App() {
       getTodo();
 
       event.target.reset();
-    } catch (err) {}
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const deleteTodo = async (todoId) => {
@@ -55,6 +57,47 @@ function App() {
       toast.success(error?.response?.data?.message || "unknown error");
     }
   };
+
+  // const editTodo = async (todoId) =>{
+  // console.log("meretodoId",todoId);
+
+  // try {
+  //   const { data } = await axios.patch(`${BASE_URL}/api/v1/todo/${todoId}`);
+  //   console.log("data mera", data);
+
+  // } catch (error) {
+  //   console.log(error);
+
+  // }
+
+  // }
+
+  // const [isChange , setisChange] = useState("")
+
+  // const onChange = (event) => {
+  //   try {
+  //     event.preventDefault();
+
+  //     const todoValue = event.target.children[0].value;
+  //     console.log("todoValue", todoValue);
+
+  //     // await axios.post(
+  //     //   `${BASE_URL}/api/v1/todo`,
+
+  //     // {
+  //     //   todo: todoValue,
+  //     //   // }
+
+  //     // );
+  //     getTodo();
+
+  //     event.target.reset();
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // };
+  // console.log(event.target.value);
+
   return (
     <div className="min-h-screen bg-gradient-to-r from-blue-300 to-blue-500 flex items-center justify-center">
       <div className="bg-white p-8 rounded-lg shadow-xl w-96">
@@ -90,9 +133,10 @@ function App() {
                 </span>
               ) : (
                 <input
+                  // onChange={onChange}
                   className="border-2"
                   type="text"
-                  value={todo.todoContent}
+                  defaultValue={todo.todoContent}
                 />
               )}
               <div className="flex gap-5 ">
@@ -117,8 +161,10 @@ function App() {
                 ) : (
                   <button
                     onClick={() => {
-                      const newTodos = todos.map((todo, i) => {
+                      const newTodos = todos.map((todo) => {
+                        // if (i === index) {
                         todo.isEditing = false;
+
                         return todo;
                       });
                       setTodos([...todos]);
