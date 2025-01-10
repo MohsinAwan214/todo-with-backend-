@@ -6,10 +6,13 @@ function App() {
   const BASE_URL = "https://todo-with-backend-chi.vercel.app";
 
   const [todos, setTodos] = useState([]);
-  // const [isEditing, setIsEditing] = useState()
   console.log(todos);
+  
+  const [editedText, setIseditedText] = useState(" ")
+
 
   const getTodo = async () => {
+   try {
     const res = await axios.get(`${BASE_URL}/api/v1/todos`);
     const todosFromServer = res?.data?.data;
 
@@ -18,6 +21,11 @@ function App() {
       return { ...todo, isEditing: false };
     });
     setTodos(newnew);
+  } catch (error) {
+     toast.dismiss()
+     toast.success(error?.response?.data?.message || "unknown error");
+    
+   }
   };
 
   useEffect(() => {
@@ -39,10 +47,37 @@ function App() {
       getTodo();
 
       event.target.reset();
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      toast.dismiss()
+      toast.success(error?.response?.data?.message || "unknown error");
     }
   };
+  
+  
+  const editTodo = async (event,todoId) => {
+    try {
+      event.preventDefault();
+
+      const todoValue = event.target.children[0].value;
+      await axios.patch(
+        `${BASE_URL}/api/v1/todo/${todoId}`,
+
+        {
+          todoContent: todoValue,
+          // todo: editedText,
+        }
+      );
+      getTodo();
+
+      event.target.reset();
+    } catch (error) {
+      toast.dismiss()
+      toast.success(error?.response?.data?.message || "unknown error");
+    }
+  };
+
+
+  
 
   const deleteTodo = async (todoId) => {
     try {
@@ -132,12 +167,33 @@ function App() {
                   {todo.todoContent}
                 </span>
               ) : (
+
+                <form onSubmit={(e)=>editTodo(e,todo.id)} className="flex justify-between  w-full">
+
+
                 <input
-                  // onChange={onChange}
-                  className="border-2"
-                  type="text"
-                  defaultValue={todo.todoContent}
+        
+                className="border-2"
+                type="text"
+                defaultValue={todo.todoContent}
                 />
+                    <button
+                    onClick={() => {
+                      const newTodos = todos.map((todo) => {
+                        // if (i === index) {
+                        todo.isEditing = false;
+
+                        return todo;
+                      });
+                      setTodos([...todos]);
+                    }}
+                    type="button"
+                  >
+                    cancel
+                  </button>
+
+                <button type="submit">save</button>
+                </form>
               )}
               <div className="flex gap-5 ">
                 {!todo.isEditing ? (
@@ -159,19 +215,7 @@ function App() {
                     Edit
                   </button>
                 ) : (
-                  <button
-                    onClick={() => {
-                      const newTodos = todos.map((todo) => {
-                        // if (i === index) {
-                        todo.isEditing = false;
-
-                        return todo;
-                      });
-                      setTodos([...todos]);
-                    }}
-                  >
-                    cancel
-                  </button>
+                 null
                 )}
                 {!todo.isEditing ? (
                   <button
@@ -194,7 +238,7 @@ function App() {
                     </svg>
                   </button>
                 ) : (
-                  <button>Save</button>
+                  null
                 )}
               </div>
             </li>
